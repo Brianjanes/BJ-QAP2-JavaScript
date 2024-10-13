@@ -1,0 +1,34 @@
+x<%- include('partials/header') %>
+
+<main class="main-content leaderboard-container">
+  <header>
+    <h1>Leaderboards</h1>
+  </header>
+  <% if (leaderboard.length > 0) { %>
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Streak</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% leaderboard.forEach((entry, index) => { %>
+        <tr class="<%= index === 0 ? 'top-score' : '' %>">
+          <td><%= index + 1 %></td>
+          <td><%= entry.streak %></td>
+          <td><%= entry.date.toLocaleString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <h2 class="no-scores">No scores recorded yet. <br />
+     playing to see your scores here!</h2>
+  <% } %>
+  <a href="/" class="home-link">Return to Home</a>
+</main>
+
+</body>
+</html>
