@@ -27,11 +27,15 @@ app.get("/", (request, response) => {
 
 // Quiz route, renders the quiz page with the current question and streak
 app.get("/quiz", (request, response) => {
-  currentQuestion = generateQuestionHandler();
-  response.render("quiz", {
-    question: currentQuestion.question,
-    streak: currentStreak,
-  });
+  try {
+    currentQuestion = generateQuestionHandler();
+    response.render("quiz", {
+      question: currentQuestion.question,
+      streak: currentStreak,
+    });
+  } catch (error) {
+    console.error("Error: ", error);
+  }
 });
 
 // Leaderboards route, renders the leaderboards page with the leaderboard array
@@ -39,27 +43,44 @@ app.get("/leaderboards", (request, response) => {
   response.render("leaderboards", { leaderboard: leaderboard });
 });
 
+// Quiz complete route, renders the quiz complete page with the final streak
+app.get("/quiz-complete", (req, res) => {
+  const finalStreak = req.query.streak || 0;
+  res.render("quiz-complete", { streak: finalStreak });
+});
+
 // POST routes
 // Quiz route, handles the quiz form submission
 app.post("/quiz", (request, response) => {
-  // Deconstructing the answer from the request body
   const { answer } = request.body;
 
-  if (answer === currentQuestion.answer) {
-    // If the answer is correct, increment the current streak and redirect to the quiz page
-    currentStreak++;
-    response.redirect("/quiz");
-  } else {
-    // Add the ended streak to the leaderboard
-    // This checks that the streak is greater than 0 before adding it to the leaderboard
-    if (currentStreak > 0) {
-      leaderboard.push({ streak: currentStreak, date: new Date() });
-      leaderboard.sort((a, b) => b.streak - a.streak);
-      leaderboard = leaderboard.slice(0, 10);
+  try {
+    if (answer === currentQuestion.answer) {
+      // If the answer is correct, increment the current streak and redirect to the quiz page
+      currentStreak++;
+      response.redirect("/quiz");
+    } else {
+      // Answer is incorrect, quiz is complete
+      const finalStreak = currentStreak; // Define finalStreak here
+
+      // Add the ended streak to the leaderboard if it's greater than 0
+      if (finalStreak > 0) {
+        leaderboard.push({ streak: finalStreak, date: new Date() });
+        leaderboard.sort((a, b) => b.streak - a.streak);
+        leaderboard = leaderboard.slice(0, 10);
+      }
+
+      // Reset the current streak
+      currentStreak = 0;
+
+      // Redirect to the quiz-complete page with the final streak
+      response.redirect(`/quiz-complete?streak=${finalStreak}`);
     }
-    // Reset the current streak and redirect to the home page
-    currentStreak = 0;
-    response.redirect("/");
+  } catch (error) {
+    console.error("Error processing answer: ", error);
+    response
+      .status(500)
+      .send("An error occurred while processing your answer.");
   }
 });
 

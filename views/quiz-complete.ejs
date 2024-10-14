@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+<main class="main-content">
+  <header>
+    <h1>Quiz Complete</h1>
+  </header>
+
+  <div class="streak-container">
+    <h2>Your Final Streak: <span class="streak"><%= streak %></span></h2>
+    <% if (streak > 0) { %>
+    <p>Congratulations on your streak!</p>
+    <% } else { %>
+    <p>Great effort! Keep practicing to improve your streak.</p>
+    <% } %>
+  </div>
+
+  <div class="navigation__container">
+    <a href="/quiz">Start New Quiz</a>
+    <a href="/">Return to Home</a>
+  </div>
+</main>
+
+</body>
+</html>]
